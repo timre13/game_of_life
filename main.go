@@ -116,7 +116,9 @@ func main() {
             case sdl.MOUSEBUTTONDOWN:
                 x := int(float32(event.(*sdl.MouseButtonEvent).X)/cellW)
                 y := int(float32(event.(*sdl.MouseButtonEvent).Y)/cellH)
-                matrix[y][x].isAlive = !matrix[y][x].isAlive
+                if x < GRID_WIDTH && y < GRID_HEIGHT {
+                    matrix[y][x].isAlive = !matrix[y][x].isAlive
+                }
 
             case sdl.KEYDOWN:
                 key := event.(*sdl.KeyboardEvent).Keysym.Sym
