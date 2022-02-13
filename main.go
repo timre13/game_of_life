@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "github.com/veandco/go-sdl2/sdl"
 )
 
@@ -13,6 +14,8 @@ func CHECK_ERR(err error) {
 const GRID_WIDTH = 200
 const GRID_HEIGHT = 150
 const WIN_TITLE = "Game of Life"
+
+var g_genCount = 1
 
 type Matrix [GRID_HEIGHT][GRID_WIDTH]MatrixCell;
 
@@ -44,6 +47,8 @@ func SimGeneration(mat *Matrix) Matrix {
             }
         }
     }
+
+    g_genCount++
 
     return mat2
 }
@@ -117,11 +122,6 @@ func main() {
                 key := event.(*sdl.KeyboardEvent).Keysym.Sym
                 if key == sdl.K_SPACE {
                     isSimulating = !isSimulating
-                    if isSimulating {
-                        win.SetTitle(WIN_TITLE+" - Simulating")
-                    } else {
-                        win.SetTitle(WIN_TITLE+" - Paused")
-                    }
                 } else if key == sdl.K_RETURN {
                     matrix = SimGeneration(&matrix)
                 }
@@ -154,6 +154,12 @@ func main() {
         matTex.Unlock()
 
         rend.Copy(matTex, nil, nil)
+
+        if isSimulating {
+            win.SetTitle(fmt.Sprintf("%s - Simulating | Generation: %d", WIN_TITLE, g_genCount))
+        } else {
+            win.SetTitle(fmt.Sprintf("%s - Paused | Generation: %d", WIN_TITLE, g_genCount))
+        }
 
         rend.Present()
         sdl.Delay(16)
