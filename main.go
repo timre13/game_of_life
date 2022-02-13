@@ -11,9 +11,15 @@ func CHECK_ERR(err error) {
     }
 }
 
-const GRID_WIDTH = 200
-const GRID_HEIGHT = 150
-const WIN_TITLE = "Game of Life"
+const GRID_WIDTH        = 200
+const GRID_HEIGHT       = 150
+const WIN_TITLE         = "Game of Life"
+const CELL_COLOR_R      = 255
+const CELL_COLOR_G      = 100
+const CELL_COLOR_B      = 0
+const BG_COLOR_R        = 0
+const BG_COLOR_G        = 0
+const BG_COLOR_B        = 0
 
 var g_genCount = 1
 
@@ -95,6 +101,8 @@ func main() {
 
     rend, err := sdl.CreateRenderer(win, 0, 0)
     CHECK_ERR(err)
+    err = rend.SetDrawBlendMode(sdl.BLENDMODE_BLEND)
+    CHECK_ERR(err)
 
     matrix := Matrix{}
     matTex, err := rend.CreateTexture(sdl.PIXELFORMAT_RGBX8888, sdl.TEXTUREACCESS_STREAMING, GRID_WIDTH, GRID_HEIGHT)
@@ -143,19 +151,36 @@ func main() {
             for x:=0; x < GRID_WIDTH; x++ {
                 index := (y*GRID_WIDTH+x)*4
                 if matrix[y][x].isAlive {
-                    pixels[index+1] = 0
-                    pixels[index+2] = 255
-                    pixels[index+3] = 0
+                    pixels[index+1] = CELL_COLOR_B
+                    pixels[index+2] = CELL_COLOR_G
+                    pixels[index+3] = CELL_COLOR_R
                 } else {
-                    pixels[index+1] = 50
-                    pixels[index+2] = 50
-                    pixels[index+3] = 50
+                    pixels[index+1] = BG_COLOR_B
+                    pixels[index+2] = BG_COLOR_G
+                    pixels[index+3] = BG_COLOR_R
                 }
             }
         }
         matTex.Unlock()
 
         rend.Copy(matTex, nil, nil)
+
+        { // Render preview cell under the cursor
+            mx, my, _ := sdl.GetMouseState()
+            cx := int(float32(mx)/cellW)
+            cy := int(float32(my)/cellH)
+            if cx < GRID_WIDTH && cy < GRID_HEIGHT {
+                if matrix[cy][cx].isAlive {
+                    rend.SetDrawColor(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B, 100)
+                } else {
+                    rend.SetDrawColor(CELL_COLOR_R, CELL_COLOR_G, CELL_COLOR_B, 100)
+                }
+                x := int32(float32(int32(float32(mx)/cellW))*cellW)
+                y := int32(float32(int32(float32(my)/cellH))*cellH)
+                rend.FillRect(&sdl.Rect{X: x, Y: y, W: int32(cellW), H: int32(cellH)})
+            }
+
+        }
 
         if isSimulating {
             win.SetTitle(fmt.Sprintf("%s - Simulating | Generation: %d", WIN_TITLE, g_genCount))
