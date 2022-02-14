@@ -139,6 +139,10 @@ func main() {
                     isSimulating = !isSimulating
                 } else if key == sdl.K_RETURN {
                     matrix = SimGeneration(&matrix)
+                } else if key == sdl.K_DELETE {
+                    matrix = Matrix{}
+                    g_genCount = 1
+                    isSimulating = false
                 }
             }
         }

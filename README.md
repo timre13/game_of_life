@@ -11,6 +11,7 @@ The classic cellular automaton implemented in Go using SDL2.
 | Toggle cell | Mouse button |
 | Start/Pause simulation | Space |
 | Step a generation | Enter |
+| Reset | Delete |
 
 ## Building
 
