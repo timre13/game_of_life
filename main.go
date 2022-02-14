@@ -38,8 +38,8 @@ func SimGeneration(mat *Matrix) Matrix {
     // Do the simulation in a copy
     mat2 := *mat
 
-    for y:=1; y < GRID_HEIGHT-1; y++ {
-        for x:=1; x < GRID_WIDTH-1; x++ {
+    for y:=0; y < GRID_HEIGHT; y++ {
+        for x:=0; x < GRID_WIDTH; x++ {
             neighCnt := CountNeighb(mat, &MatrixPos{x: x, y: y})
 
             if neighCnt < 2 {
@@ -60,8 +60,13 @@ func SimGeneration(mat *Matrix) Matrix {
 }
 
 func CountNeighb(mat *Matrix, pos *MatrixPos) int {
-    cellToInt := func(cell *MatrixCell) int {
-        if cell.isAlive {
+    cellToInt := func(x int, y int) int {
+        // Return 0 if out of bounds
+        if x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT {
+            return 0;
+        }
+
+        if mat[y][x].isAlive {
             return 1
         } else {
             return 0
@@ -71,18 +76,18 @@ func CountNeighb(mat *Matrix, pos *MatrixPos) int {
     count := 0
 
     // Top
-    count += cellToInt(&(*mat)[pos.y-1][pos.x-1])
-    count += cellToInt(&(*mat)[pos.y-1][pos.x+0])
-    count += cellToInt(&(*mat)[pos.y-1][pos.x+1])
+    count += cellToInt(pos.x-1, pos.y-1)
+    count += cellToInt(pos.x-1, pos.y+0)
+    count += cellToInt(pos.x-1, pos.y+1)
 
     // Middle
-    count += cellToInt(&(*mat)[pos.y+0][pos.x-1])
-    count += cellToInt(&(*mat)[pos.y+0][pos.x+1])
+    count += cellToInt(pos.x+0, pos.y-1)
+    count += cellToInt(pos.x+0, pos.y+1)
 
     // Bottom
-    count += cellToInt(&(*mat)[pos.y+1][pos.x-1])
-    count += cellToInt(&(*mat)[pos.y+1][pos.x+0])
-    count += cellToInt(&(*mat)[pos.y+1][pos.x+1])
+    count += cellToInt(pos.x+1, pos.y-1)
+    count += cellToInt(pos.x+1, pos.y+0)
+    count += cellToInt(pos.x+1, pos.y+1)
 
     return count
 }
